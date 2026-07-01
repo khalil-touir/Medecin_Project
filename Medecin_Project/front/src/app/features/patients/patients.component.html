@@ -1,0 +1,178 @@
+<div class="patients-page">
+
+  <!-- Page header -->
+  <div class="page-header">
+    <div class="page-title">
+      <h1>Patients</h1>
+      <p>{{ patients.length }} registered patients in the system</p>
+    </div>
+    <button class="btn-primary" (click)="openModal()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+      Add Patient
+    </button>
+  </div>
+
+  <!-- Search bar -->
+  <div class="card filter-card fade-in">
+    <div class="filter-bar">
+      <div class="search-wrapper">
+        <span class="search-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+        </span>
+        <input
+          type="text"
+          placeholder="Search by name or phone..."
+          [ngModel]="searchTerm"
+          (ngModelChange)="onSearch($event)"
+        />
+      </div>
+      <div class="filter-count">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+        </svg>
+        <span>{{ filteredPatients.length }} patients</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  @if (loading) {
+    <div class="loading-wrapper">
+      <div class="spinner"></div>
+      <span>Loading patients...</span>
+    </div>
+  }
+
+  <!-- Empty state -->
+  @if (!loading && filteredPatients.length === 0) {
+    <div class="empty-state-card card">
+      <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+      </svg>
+      <h3>No patients found</h3>
+      <p>{{ searchTerm ? 'Try a different search term.' : 'Add your first patient to get started.' }}</p>
+      @if (!searchTerm) {
+        <button class="btn-primary" (click)="openModal()">Add First Patient</button>
+      }
+    </div>
+  }
+
+  <!-- Table -->
+  @if (!loading && filteredPatients.length > 0) {
+    <div class="card table-wrapper fade-in delay-2">
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Patient</th>
+              <th>Phone</th>
+              <th>Date of Birth</th>
+              <th>Age</th>
+              <th>Registered</th>
+              <th>ID</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (patient of filteredPatients; track patient.id; let i = $index) {
+              <tr class="fade-in" [style.animation-delay]="(i * 0.04) + 's'">
+                <td>
+                  <div class="patient-cell">
+                    <div class="patient-avatar" [style.background]="getAvatarColor(patient) + '1A'" [style.color]="getAvatarColor(patient)">
+                      {{ getInitials(patient) }}
+                    </div>
+                    <div class="patient-info">
+                      <span class="patient-name">{{ patient.firstName }} {{ patient.lastName }}</span>
+                      <span class="patient-id">#{{ patient.id }}</span>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div class="phone-cell">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 11 19.79 19.79 0 0 1 1.61 2.18 2 2 0 0 1 3.6 0h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 7.91a16 16 0 0 0 6.08 6.08l.91-.91a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                    </svg>
+                    {{ patient.phone }}
+                  </div>
+                </td>
+                <td>{{ formatDate(patient.dateOfBirth) }}</td>
+                <td>
+                  <span class="age-badge">{{ calculateAge(patient.dateOfBirth) }} yrs</span>
+                </td>
+                <td class="date-cell">{{ formatDate(patient.createdAt ?? '') }}</td>
+                <td>
+                  <span class="id-badge">#{{ patient.id }}</span>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+
+  <!-- Add Patient Modal -->
+  @if (showModal) {
+    <div class="modal-overlay" (click)="closeModal()">
+      <div class="modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>Add New Patient</h3>
+          <button class="modal-close" (click)="closeModal()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+        <form [formGroup]="patientForm" (ngSubmit)="savePatient()">
+          <div class="modal-body">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">First Name *</label>
+                <input type="text" class="form-control" formControlName="firstName" placeholder="Jane"
+                  [class.error]="patientForm.get('firstName')?.invalid && patientForm.get('firstName')?.touched"/>
+                @if (patientForm.get('firstName')?.invalid && patientForm.get('firstName')?.touched) {
+                  <span class="form-error">First name is required.</span>
+                }
+              </div>
+              <div class="form-group">
+                <label class="form-label">Last Name *</label>
+                <input type="text" class="form-control" formControlName="lastName" placeholder="Doe"
+                  [class.error]="patientForm.get('lastName')?.invalid && patientForm.get('lastName')?.touched"/>
+                @if (patientForm.get('lastName')?.invalid && patientForm.get('lastName')?.touched) {
+                  <span class="form-error">Last name is required.</span>
+                }
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Phone Number *</label>
+              <input type="tel" class="form-control" formControlName="phone" placeholder="+1 234 567 8900"
+                [class.error]="patientForm.get('phone')?.invalid && patientForm.get('phone')?.touched"/>
+              @if (patientForm.get('phone')?.invalid && patientForm.get('phone')?.touched) {
+                <span class="form-error">Valid phone number is required.</span>
+              }
+            </div>
+            <div class="form-group">
+              <label class="form-label">Date of Birth *</label>
+              <input type="date" class="form-control" formControlName="dateOfBirth"
+                [max]="today"
+                [class.error]="patientForm.get('dateOfBirth')?.invalid && patientForm.get('dateOfBirth')?.touched"/>
+              @if (patientForm.get('dateOfBirth')?.invalid && patientForm.get('dateOfBirth')?.touched) {
+                <span class="form-error">Date of birth is required.</span>
+              }
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn-secondary" (click)="closeModal()">Cancel</button>
+            <button type="submit" class="btn-primary" [disabled]="saving">
+              @if (saving) { Saving... } @else { Add Patient }
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+</div>

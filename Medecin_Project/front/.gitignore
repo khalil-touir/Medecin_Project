@@ -1,0 +1,24 @@
+# Node
+node_modules/
+npm-debug.log*
+
+# Angular build output
+dist/
+.angular/cache/
+
+# IDEs
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local

@@ -1,0 +1,85 @@
+<aside class="sidebar" [class.collapsed]="collapsed">
+
+  <!-- Logo -->
+  <div class="sidebar__logo">
+    <div class="logo-icon">
+      <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="20" cy="20" r="20" fill="#2563EB"/>
+        <path d="M20 10 C20 10 12 15 12 22 C12 27 15 30 20 30 C25 30 28 27 28 22 C28 15 20 10 20 10Z" fill="white" opacity="0.9"/>
+        <rect x="17" y="16" width="6" height="14" rx="1" fill="#2563EB"/>
+        <rect x="13" y="20" width="14" height="6" rx="1" fill="#2563EB"/>
+      </svg>
+    </div>
+    @if (!collapsed) {
+      <div class="logo-text">
+        <span class="logo-name">MediCare</span>
+        <span class="logo-tagline">Medical System</span>
+      </div>
+    }
+  </div>
+
+  <!-- Toggle button -->
+  <button class="sidebar__toggle" (click)="onToggle()" title="Toggle sidebar">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      @if (collapsed) {
+        <polyline points="9 18 15 12 9 6"/>
+      } @else {
+        <polyline points="15 18 9 12 15 6"/>
+      }
+    </svg>
+  </button>
+
+  <!-- Navigation -->
+  <nav class="sidebar__nav">
+    @if (!collapsed) {
+      <div class="nav-section-label">NAVIGATION</div>
+    }
+
+    @for (item of navItems; track item.route) {
+      <a
+        [routerLink]="item.route"
+        routerLinkActive="active"
+        class="nav-item"
+        [title]="collapsed ? item.label : ''"
+      >
+        <span class="nav-icon" [innerHTML]="item.icon"></span>
+        @if (!collapsed) {
+          <span class="nav-label">{{ item.label }}</span>
+        }
+        <span class="nav-indicator"></span>
+      </a>
+    }
+  </nav>
+
+  <!-- Spacer -->
+  <div class="sidebar__spacer"></div>
+
+  <!-- User section -->
+  <div class="sidebar__user" [class.collapsed]="collapsed">
+    <div class="user-avatar">
+      {{ userInitials }}
+    </div>
+    @if (!collapsed) {
+      <div class="user-info">
+        <span class="user-email">{{ userEmail }}</span>
+        <span class="user-role">{{ userRole }}</span>
+      </div>
+      <button class="logout-btn" (click)="logout()" title="Logout">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16 17 21 12 16 7"/>
+          <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+      </button>
+    } @else {
+      <button class="logout-btn-collapsed" (click)="logout()" title="Logout">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16 17 21 12 16 7"/>
+          <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+      </button>
+    }
+  </div>
+
+</aside>
